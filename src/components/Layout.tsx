@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
+import { HairlineFigure } from "./HairlineFigure";
 
 export function Layout() {
   const { pathname } = useLocation();
@@ -25,7 +26,13 @@ export function Layout() {
         <Outlet />
       </main>
       <footer className="site-footer">
-        <div className="container">Skills are sourced from public GitHub repositories and belong to their authors.</div>
+        <div className="container footer-inner">
+          <p>Skills are sourced from public GitHub repositories and belong to their authors.</p>
+          <div className="footer-signature">
+            <HairlineFigure name="sheets" className="footer-sheets hairline-quiet-stage" label="Three folded skill sheets" />
+            <a className="footer-credit" href="https://www.meedaydesign.xyz/" target="_blank" rel="noopener noreferrer">Built by Meeday</a>
+          </div>
+        </div>
       </footer>
     </>
   );

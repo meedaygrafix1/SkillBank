@@ -4,6 +4,8 @@ import { categories, hasDates, hasStars, skills } from "../lib/data";
 import { searchSkills, sortSkills } from "../lib/search";
 import { SkillCard } from "../components/SkillCard";
 import { HairlineArchive } from "../components/HairlineArchive";
+import { HeroHeadline } from "../components/HeroHeadline";
+import { HairlineFigure } from "../components/HairlineFigure";
 import { SearchIcon, XIcon } from "../components/Icons";
 import type { SortKey } from "../types";
 
@@ -120,7 +122,7 @@ export function Browse() {
         <div className="container hero-layout">
           <div className="hero-copy">
           <p className="hero-eyebrow">The skill archive / Open for discovery</p>
-          <h1><span>Make your agent</span><span>more capable.</span></h1>
+          <HeroHeadline />
           <p className="hero-sub">
             {skills.length > 0 ? (
               <>
@@ -215,6 +217,7 @@ export function Browse() {
           </div>
         ) : skills.length === 0 ? (
           <div className="empty">
+            <HairlineFigure name="empty-tray" className="empty-tray hairline-quiet-stage" label="An empty skill tray" />
             <h2>No skills yet</h2>
             <p>
               Add your CSV at <code>data/skills.csv</code>, then run <code>npm run import</code>.
@@ -222,6 +225,7 @@ export function Browse() {
           </div>
         ) : (
           <div className="empty">
+            <HairlineFigure name="empty-tray" className="empty-tray hairline-quiet-stage" label="An empty skill tray" />
             <h2>No skills match{q ? ` “${q}”` : ""}</h2>
             <p>Try a shorter search, a different spelling, or fewer categories.</p>
             <button type="button" className="btn" onClick={clearAll}>Clear search and filters</button>
