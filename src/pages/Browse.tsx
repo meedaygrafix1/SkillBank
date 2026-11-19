@@ -6,7 +6,7 @@ import { SkillCard } from "../components/SkillCard";
 import { HairlineArchive } from "../components/HairlineArchive";
 import { HeroHeadline } from "../components/HeroHeadline";
 import { HairlineFigure } from "../components/HairlineFigure";
-import { SearchIcon, XIcon } from "../components/Icons";
+import { DownloadIcon, SearchIcon, XIcon } from "../components/Icons";
 import type { SortKey } from "../types";
 
 const PAGE_SIZE = 24;
@@ -82,7 +82,12 @@ export function Browse() {
   };
 
   // ---- derive results
-  const matched = useMemo(() => searchSkills(q), [q]);
+  const mdOnly = params.get("md") === "1";
+  const matched = useMemo(() => {
+    const found = searchSkills(q);
+    return mdOnly ? found.filter((s) => s.mdFileUrl) : found;
+  }, [q, mdOnly]);
+  const mdCount = useMemo(() => searchSkills(q).filter((s) => s.mdFileUrl).length, [q]);
   const facetCounts = useMemo(() => {
     const m = new Map<string, number>();
     for (const s of matched) m.set(s.category, (m.get(s.category) ?? 0) + 1);
@@ -114,7 +119,7 @@ export function Browse() {
     document.title = q ? `“${q}” · Skill Bank` : "Skill Bank · AI agent skills";
   }, [q]);
 
-  const hasFilters = !!q || selected.size > 0;
+  const hasFilters = !!q || selected.size > 0 || mdOnly;
 
   return (
     <>
@@ -197,6 +202,16 @@ export function Browse() {
               <button type="button" className="link-btn" onClick={clearAll}>Clear filters</button>
             )}
           </p>
+          <div className="toolbar-end">
+          <button
+            type="button"
+            className="chip md-toggle"
+            aria-pressed={mdOnly}
+            onClick={() => update({ md: mdOnly ? null : "1", page: null }, false)}
+            title="Only show skills with a downloadable SKILL.md"
+          >
+            <DownloadIcon size={14} /> Has SKILL.md <span className="chip-count">{mdCount}</span>
+          </button>
           {sortOptions.length > 1 && (
             <label className="sort">
               <span>Sort</span>
@@ -207,6 +222,7 @@ export function Browse() {
               </select>
             </label>
           )}
+          </div>
         </div>
 
         {visible.length > 0 ? (
