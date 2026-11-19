@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { bySlug, relatedSkills } from "../lib/data";
-import { downloadFile, formatDate, formatStars, relativeDate } from "../lib/format";
+import { downloadFile, downloadText, formatDate, formatStars, relativeDate } from "../lib/format";
 import { ArrowLeftIcon, DownloadIcon, GitHubIcon, StarIcon } from "../components/Icons";
 import { CopyButton } from "../components/CopyButton";
 import { MarkdownPreview } from "../components/MarkdownPreview";
@@ -13,9 +13,12 @@ export function SkillDetail() {
   const skill = bySlug.get(slug);
   const navigate = useNavigate();
   const [downloading, setDownloading] = useState(false);
+  // Raw SKILL.md text, once the preview has fetched it — lets us offer a download without a second request.
+  const [mdText, setMdText] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = skill ? `${skill.name} · Skill Bank` : "Not found · Skill Bank";
+    setMdText(null);
   }, [skill]);
 
   if (!skill) return <NotFound />;
@@ -30,9 +33,13 @@ export function SkillDetail() {
     else navigate("/");
   };
 
+  const canDownload = !!skill.mdFileUrl || mdText !== null;
+
   const onDownload = async () => {
+    const filename = `${skill.slug}.md`;
+    if (mdText !== null) return downloadText(mdText, filename);
     setDownloading(true);
-    await downloadFile(skill.mdFileUrl!, `${skill.slug}.md`);
+    await downloadFile(skill.mdFileUrl!, filename);
     setDownloading(false);
   };
 
@@ -72,14 +79,14 @@ export function SkillDetail() {
           </ul>
         </div>
 
-        {(skill.githubUrl || skill.mdFileUrl) && (
+        {(skill.githubUrl || canDownload) && (
           <div className="actions">
             {skill.githubUrl && (
               <a className="btn primary" href={skill.githubUrl} target="_blank" rel="noopener noreferrer">
                 <GitHubIcon size={16} /> View on GitHub
               </a>
             )}
-            {skill.mdFileUrl && (
+            {canDownload && (
               <button type="button" className="btn" disabled={downloading} onClick={onDownload}>
                 <DownloadIcon size={16} /> {downloading ? "Downloading…" : "Download .md"}
               </button>
@@ -127,7 +134,7 @@ export function SkillDetail() {
       {previewUrl && (
         <section className="section" aria-labelledby="preview-h">
           <h2 id="preview-h" className="section-title">SKILL.md</h2>
-          <MarkdownPreview url={previewUrl} githubUrl={skill.githubUrl} />
+          <MarkdownPreview key={previewUrl} url={previewUrl} githubUrl={skill.githubUrl} onLoaded={setMdText} />
         </section>
       )}
 

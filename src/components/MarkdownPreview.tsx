@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 
@@ -44,8 +44,19 @@ function render(md: string, fileUrl: string): string {
   return clean;
 }
 
-export function MarkdownPreview({ url, githubUrl }: { url: string; githubUrl?: string }) {
+export function MarkdownPreview({
+  url,
+  githubUrl,
+  onLoaded,
+}: {
+  url: string;
+  githubUrl?: string;
+  /** Called with the raw file text once it has loaded and looks like a real file. */
+  onLoaded?: (text: string) => void;
+}) {
   const [state, setState] = useState<State>({ status: "loading" });
+  const onLoadedRef = useRef(onLoaded);
+  onLoadedRef.current = onLoaded;
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -59,6 +70,7 @@ export function MarkdownPreview({ url, githubUrl }: { url: string; githubUrl?: s
         const { meta, body } = splitFrontmatter(text);
         if (!body.trim() && !meta.length) throw new Error("empty");
         setState({ status: "ok", html: render(body, url), meta });
+        onLoadedRef.current?.(text);
       })
       .catch((e) => {
         if (e.name !== "AbortError") setState({ status: "error" });

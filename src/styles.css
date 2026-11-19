@@ -276,6 +276,8 @@ button { font: inherit; color: inherit; }
   margin: 28px 0 16px; outline: none; scroll-margin-top: 80px;
 }
 .result-count { margin: 0; color: var(--text-muted); font-size: 0.925rem; display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+.toolbar-end { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.md-toggle { display: inline-flex; align-items: center; gap: 6px; }
 .sort { display: inline-flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.875rem; }
 .sort select {
   height: 36px; padding: 0 32px 0 12px;
@@ -313,6 +315,11 @@ button { font: inherit; color: inherit; }
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   font-size: 0.825rem;
 }
+.card-foot-end { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+/* Sit above the card-link's full-card ::after overlay so the button gets the click. */
+.card-download { position: relative; z-index: 1; margin: -6px -6px -6px 0; }
+.card-download:disabled { cursor: progress; opacity: 0.6; }
+.card-download.is-missing { color: var(--text-faint); }
 .author { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
 .category-tag {

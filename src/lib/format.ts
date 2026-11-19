@@ -18,19 +18,23 @@ export function relativeDate(iso: string): string {
 }
 
 /** Download a cross-origin file (raw.githubusercontent sends CORS headers) with a proper filename. */
+export function downloadText(text: string, filename: string) {
+  const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+  const href = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = href;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(href), 1000);
+}
+
 export async function downloadFile(url: string, filename: string) {
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(String(res.status));
-    const blob = new Blob([await res.text()], { type: "text/markdown;charset=utf-8" });
-    const href = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = href;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(href), 1000);
+    downloadText(await res.text(), filename);
   } catch {
     window.open(url, "_blank", "noopener");
   }
